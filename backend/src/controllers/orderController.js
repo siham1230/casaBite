@@ -1,4 +1,3 @@
-// src/controllers/orderController.js
 import { Order, OrderItem, Cart, Product, Restaurant } from '../Models/Associations.js';
 import sequelize from '../config/database.js';
 
@@ -8,7 +7,7 @@ export const createOrder = async (req, res) => {
 
     try {
         const userId = req.user.id;
-        const { deliveryAddress, deliveryDistrict, customerName, customerPhone, notes } = req.body;
+        const { deliveryAddress, deliveryDistrict, customerName, customerPhone } = req.body;
 
         if (!deliveryAddress || !deliveryDistrict || !customerName || !customerPhone) {
             await t.rollback();
@@ -77,11 +76,8 @@ export const createOrder = async (req, res) => {
             deliveryDistrict,
             customerName,
             customerPhone,
-            subtotal: subtotal.toFixed(2),
-            deliveryCost: deliveryCost.toFixed(2),
             total: total.toFixed(2),
-            estimatedDeliveryTime: restaurant.deliveryTime,
-            notes
+
         }, { transaction: t });
 
         await Promise.all(

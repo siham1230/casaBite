@@ -7,7 +7,8 @@
   "scripts": {
     "start": "nodemon src/app.js",
     "seed": "node src/seeders/seedAll.js",
-    "dev": "nodemon src/app.js",
+    "docker:build": "docker-compose up --build",
+    "docker:seed": "docker-compose exec backend npm run seed",
     "test": "jest"
   },
   "keywords": [],

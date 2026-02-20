@@ -50,24 +50,8 @@ const Order = sequelize.define('Order', {
     customerPhone: {
         type: DataTypes.STRING, allowNull: false, field: 'customer_phone'
     },
-    subtotal: {
-        type: DataTypes.DECIMAL(10, 2), allowNull: false,
-        defaultValue: 0,
-        validate: {
-            min: 0
-        },
-        comment: 'Sum of all products (before delivery)'
-    },
-    deliveryCost: {
-        type: DataTypes.DECIMAL(10, 2), allowNull: false,
-        defaultValue: 0,
-        field: 'delivery_cost',
-        comment: 'Delivery fee in MAD'
-    },
-    discount: {
-        type: DataTypes.DECIMAL(10, 2), allowNull: true,
-        defaultValue: 0,
-    },
+
+
     total: {
         type: DataTypes.DECIMAL(10, 2), allowNull: false,
         validate: {
@@ -80,15 +64,7 @@ const Order = sequelize.define('Order', {
         defaultValue: 'CASH',
         field: 'payment_method'
     },
-    paymentStatus: {
-        type: DataTypes.ENUM('PENDING', 'PAID', 'FAILED'),
-        defaultValue: 'PENDING',
-        field: 'payment_status'
-    },
-    estimatedDeliveryTime: {
-        type: DataTypes.INTEGER, allowNull: true,
-        field: 'estimated_delivery_time',
-    },
+
 
     cancelReason: {
         type: DataTypes.TEXT, allowNull: true,

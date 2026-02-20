@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import Jwt from 'jsonwebtoken';
-import User from '../Models/User.js';
+import User from '../models/User.js';
 
 
 const generateToken = (user) => {
@@ -13,63 +13,96 @@ const generateToken = (user) => {
 
 export const register = async (req, res) => {
     try {
-        console.log('📝 Registration attempt:', req.body);
+        const { name, email, password, phone, address } = req.body;
+        console.log('📝 Registration attempt:', { name, email, phone, });
 
-        const { name, email, password } = req.body;
         if (!name || !email || !password) {
-            return res.status(400).json({ error: 'Name, Email and password are required' });
+            return res.status(400).json({
+                success: false,
+                error: 'Name, Email and password are required'
+            });
         }
 
-
+        console.log('🔍 Checking for existing user:', email);
         const existingUser = await User.findOne({ where: { email } });
-        console.log('🔍 Existing user check:', existingUser ? 'Found' : 'Not found');
+
         if (existingUser) {
+            console.log('❌ User already exists');
             return res.status(400).json({
+                success: false,
                 error: 'Email already registered'
             });
         }
+        console.log('🔍 Existing user check: not found');
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         console.log('🔐 Password hashed successfully');
 
         const user = await User.create({
             name,
-            email,
+            email: email.toLowerCase(),
             password: hashedPassword,
-            role: 'customer'
+            phone: phone || null,
+            address: address || null,
+            role: 'customer',
+            isActive: true
         });
 
         console.log('✅ User created:', user.id, user.email);
 
-        const token = generateToken(user);
+        const token = Jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        console.log('✅ Token generated');
+
 
         res.status(201).json({
+            success: true,
             message: 'User registered successfully',
             token,
             user: {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                phone: user.phone,
+                address: user.address,
+                isActive: user.isActive
             }
 
         });
     } catch (error) {
         console.error('Register error:', error);
-
-
-
         res.status(500).json({
-            error: 'Server error during registration'
-        });
+            success: false,
+            error: 'Register failed'
+        })
     }
 };
+
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log('📝 Login attempt:', email);
 
 
-        const user = await User.scope('WithPassword').findOne({ where: { email } });
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email and password are required'
+            });
+        }
+        const user = await User.findOne({ where: { email: email.toLowerCase() } });
+
+
+        console.log('🔍 User found:', user ? 'Yes' : 'No');
 
         if (!user) {
             return res.status(401).json({
@@ -82,33 +115,42 @@ export const login = async (req, res) => {
                 error: 'Account has been deactivated'
             });
         }
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log('🔐 Password valid:', isPasswordValid);
 
-        if (!isValidPassword) {
+        if (!isPasswordValid) {
             return res.status(401).json({
+                success: false,
                 error: 'Invalid credentials'
             });
         }
 
-        user.lastLogin = new Date();
-        await user.save();
+        await user.update({ lastLogin: new Date() });
 
-        const token = generateToken(user);
-
-        res.json({
-            message: 'Login successful',
-            token,
-            user: {
+        const token = Jwt.sign(
+            {
                 id: user.id,
-                name: user.name,
                 email: user.email,
                 role: user.role
-            }
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+
+        );
+        console.log('✅ Login successful:', user.email);
+        const { password: _, ...userWithoutPassword } = user.toJSON();
+
+
+        res.json({
+            success: true,
+            message: 'Login successful',
+            token,
+            user: userWithoutPassword
         });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({
-            error: 'Server error during login'
+            error: 'login failed'
         });
     }
 };

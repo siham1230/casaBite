@@ -1,13 +1,11 @@
 import { Tabs } from 'expo-router';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaFrame, } from 'react-native-safe-area-context';
-// import { useCartStore } from '../../store/cartStore';
 
 export default function TabLayout() {
     const { bottom } = useSafeAreaFrame()
     // const cartCount = useCartStore((state) => state.items.length);
     return (
-        // <SafeAreaView style={{ flex: 1 }}>
 
         <Tabs
             screenOptions={{
@@ -43,19 +41,18 @@ export default function TabLayout() {
                 options={{
                     title: 'Search',
                     tabBarIcon: ({ color, size }) => (
-                        <FontAwesome name="search" size={size} color={color} />
-                    ),
+                        <Ionicons name="search" size={size} color={color} />
+                    )
                 }}
             />
 
             <Tabs.Screen
-                name="orders"
+                name="cart"
                 options={{
-                    title: 'Orders',
+                    title: 'Cart',
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="order" size={size} color={color} />
+                        <Ionicons name="cart" size={size} color={color} />
                     ),
-                    tabBarBadge: cartCount > 0 ? cartCount : undefined,
 
                 }}
             />
@@ -64,8 +61,7 @@ export default function TabLayout() {
                 options={{
                     title: 'Profile',
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="person" size={size} color={color} />
-                    ),
+                        <Ionicons name="person-circle-outline" size={size} color={color} />),
                 }}
             />
         </Tabs>

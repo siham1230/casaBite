@@ -6,7 +6,7 @@ import sequelize from "../config/database.js";
 import bcrypt from 'bcrypt';
 
 
-import { User, Category, Restaurant, Product } from '../Models/Associations.js';
+import { User, Category, Restaurant, Product } from '../models/Associations.js';
 
 
 const seedAll = async () => {
@@ -191,7 +191,7 @@ const seedAll = async () => {
                 name: 'Saigon Street',
                 description: 'Authentic Vietnamese street food and pho',
                 categoryId: categories[1].id,
-                image: 'https://res.cloudinary.com/due3ly2d3/image/upload/v1771029123/sagegon_idcs20.',
+                image: 'https://i.pinimg.com/1200x/0b/bf/82/0bbf82ad3048d5c3c9addcef66758ab5.jpg',
                 address: 'Boulevard Zerktouni, Maârif',
                 district: 'Maârif',
                 phone: '+212522987654',
